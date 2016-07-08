@@ -2,9 +2,9 @@ package stock
 
 import (
   "net/http"
-  "fmt"
   "io/ioutil"
   "strings"
+  "errors"
 )
 
 const URL = "http://hq.sinajs.cn/list="
@@ -43,56 +43,65 @@ type Sina struct {
   Cal string
   Time string
 }
+var indexError error
 
-func Read(num string) (*Sina){
+func Read(num string) (*Sina, error){
   var sin Sina
   res,err := http.Get(URL + num)
   if err != nil{
-    fmt.Println(err)
+    return &sin, err
   }
+
   defer res.Body.Close()
 
   dst, err := ioutil.ReadAll(res.Body)
   if err != nil{
-    fmt.Print(err)
+    return &sin, err
   }
+
   udst := unicode(string(dst))
   chars := split([]rune(udst))
-  sin = Sina{
-    chars[0],
-    chars[1],
-    chars[2],
-    chars[3],
-    chars[4],
-    chars[5],
-    chars[6],
-    chars[7],
-    chars[8],
-    chars[9],
-    chars[10],
-    chars[11],
-    chars[12],
-    chars[13],
-    chars[14],
-    chars[15],
-    chars[16],
-    chars[17],
-    chars[18],
-    chars[19],
-    chars[20],
-    chars[21],
-    chars[22],
-    chars[23],
-    chars[24],
-    chars[25],
-    chars[26],
-    chars[27],
-    chars[28],
-    chars[29],
-    chars[30],
-    chars[31],
+
+  if len(chars) < 31{
+    indexError = errors.New("index out of range")
+    return &sin, indexError
   }
-  return &sin
+  sin = Sina{
+      chars[0],
+      chars[1],
+      chars[2],
+      chars[3],
+      chars[4],
+      chars[5],
+      chars[6],
+      chars[7],
+      chars[8],
+      chars[9],
+      chars[10],
+      chars[11],
+      chars[12],
+      chars[13],
+      chars[14],
+      chars[15],
+      chars[16],
+      chars[17],
+      chars[18],
+      chars[19],
+      chars[20],
+      chars[21],
+      chars[22],
+      chars[23],
+      chars[24],
+      chars[25],
+      chars[26],
+      chars[27],
+      chars[28],
+      chars[29],
+      chars[30],
+      chars[31],
+    }
+  return &sin, nil
+
 }
 
 func split(r []rune) []string{
