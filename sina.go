@@ -3,43 +3,29 @@ package stock
 import (
   "net/http"
   "io/ioutil"
-  "strings"
   "errors"
 )
 
 const URL = "http://hq.sinajs.cn/list="
 
+type ThighOrMoney struct{
+  thigh float64
+  money float64
+}
+
 type Sina struct {
   Name string
-  Today string
-  Tomorrow string
-  Current string
-  TodayMax string
-  TodayMin string
-  BuyOneBidPrice string //买一竞买价
-  SellOneBidPrice string //卖一竞买价
-  DealNumber string
-  DealMoney string
-  BuyOneThigh string //买一申请多少股,需要除以100得到手
-  BuyOneMoney string //买一价格
-  BuyTwoThigh string
-  BuyTwoMoney string
-  BuyThreeThigh string
-  BuyThreeMoney string
-  BuyFourThigh string
-  BuyFourMoney string
-  BuyFiveThigh string
-  BuyFiveMoney string
-  SellOneThigh string //卖一申请多少股,需要除以100得到手
-  SellOneMoney string //卖一价格
-  SellTwoThigh string
-  SellTwoMoney string
-  SellThreeThigh string
-  SellThreeMoney string
-  SellFourThigh string
-  SellFourMoney string
-  SellFiveThigh string
-  SellFiveMoney string
+  Today float64
+  Tomorrow float64
+  Current float64
+  TodayMax float64
+  TodayMin float64
+  BuyOneBidPrice float64 //买一竞买价
+  SellOneBidPrice float64 //卖一竞买价
+  DealNumber float64
+  DealMoney float64
+  BuyOneList []ThighOrMoney //买一申请多少股,需要除以100得到手
+  SellOneThigh []ThighOrMoney //卖一申请多少股,需要除以100得到手
   Cal string
   Time string
 }
@@ -60,52 +46,43 @@ func Read(num string) (*Sina, error){
   }
 
   udst := unicode(string(dst))
-  chars := split([]rune(udst))
-
-  if len(chars) < 31{
+  chars := splitString([]rune(udst))
+  floats := stringListToFloatList(chars[:], 1, len(chars) - 3)
+  chars = append(chars[:1], chars[30:]...)
+  if len(chars) < 3{
     indexError = errors.New("index out of range")
     return &sin, indexError
   }
   sin = Sina{
       chars[0],
-      chars[1],
-      chars[2],
-      chars[3],
-      chars[4],
-      chars[5],
-      chars[6],
-      chars[7],
-      chars[8],
-      chars[9],
-      chars[10],
-      chars[11],
-      chars[12],
-      chars[13],
-      chars[14],
-      chars[15],
-      chars[16],
-      chars[17],
-      chars[18],
-      chars[19],
-      chars[20],
-      chars[21],
-      chars[22],
-      chars[23],
-      chars[24],
-      chars[25],
-      chars[26],
-      chars[27],
-      chars[28],
-      chars[29],
-      chars[30],
-      chars[31],
+      floats[0],
+      floats[1],
+      floats[2],
+      floats[3],
+      floats[4],
+      floats[5],
+      floats[6],
+      floats[7],
+      floats[8],
+      []ThighOrMoney{
+        {floats[9],floats[10]},
+        {floats[12],floats[12]},
+        {floats[13],floats[14]},
+        {floats[15],floats[16]},
+        {floats[17],floats[18]},
+      },
+      []ThighOrMoney{
+        {floats[19],floats[20]},
+        {floats[21],floats[22]},
+        {floats[23],floats[24]},
+        {floats[25],floats[26]},
+        {floats[27],floats[28]},
+      },
+    chars[1],
+    chars[2],
     }
   return &sin, nil
 
 }
 
-func split(r []rune) []string{
-  r = r[21: len(r) - 3]
-  return strings.Split(string(r), ",")
-}
 
