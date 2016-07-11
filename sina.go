@@ -6,7 +6,9 @@ import (
   "strings"
 )
 
-const URL = "http://hq.sinajs.cn/list="
+const (
+  SINA_URL = "http://hq.sinajs.cn/list="
+)
 
 type ThighOrMoney struct{
   thigh float64
@@ -30,6 +32,8 @@ type Stocks struct {
   Cal string
   Time string
 }
+
+
 //需要处理的数据
 func Read(s string) ([]*Stocks, error){
   list := strings.Split(s, ",")
@@ -47,7 +51,7 @@ func Read(s string) ([]*Stocks, error){
 func getData(s string)(*Stocks, error){
   var stos *Stocks
   ch := make(chan *Stocks, 0)
-  res,err := http.Get(URL + s)
+  res,err := http.Get(SINA_URL + s)
   if err != nil{
     return stos, err
   }
@@ -100,3 +104,18 @@ func dataProcessing(s []byte, number string, ch chan *Stocks){
   ch <- &stocks
 }
 
+
+//Stocks结构体方法
+func (s *Stocks) History(){
+  yahoo_url := "http://table.finance.yahoo.com/table.csv?s="
+  stock_number := s.Number
+  if ok := strings.HasPrefix(stock_number,"sh");ok{
+    new_number := strings.Replace(stock_number, "sh", "", -1)
+    yahoo_url = yahoo_url + new_number + ".ss"
+  }else{
+    new_number := strings.Replace(stock_number, "sz", "", -1)
+    yahoo_url = yahoo_url + new_number + ".sz"
+  }
+  res, _ := http.Get(yahoo_url)
+  defer res.Body.Close();
+}

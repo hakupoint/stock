@@ -5,6 +5,8 @@ import (
   "strconv"
   "fmt"
   "strings"
+  "bufio"
+  "io"
 )
 
 func unicode(s string) string{
@@ -31,4 +33,17 @@ func splitString(r []rune) []string{
 
 func floatToString(f float64) string{
   return strconv.FormatFloat(f, 'f', 6, 64)
+}
+
+func parseCsv(s io.Reader) []string{
+  chars := []string{}
+  reader := bufio.NewReader(s)
+  for{
+    char, err := reader.ReadBytes('\n')
+    if err == io.EOF{
+      break
+    }
+    chars = append(chars,string(char))
+  }
+  return chars[1:]
 }
