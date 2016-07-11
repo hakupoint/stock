@@ -14,6 +14,7 @@ type ThighOrMoney struct{
 }
 
 type Stocks struct {
+  Number string
   Name string
   Today float64
   Tomorrow float64
@@ -29,8 +30,7 @@ type Stocks struct {
   Cal string
   Time string
 }
-var indexError error
-
+//需要处理的数据
 func Read(s string) ([]*Stocks, error){
   list := strings.Split(s, ",")
   stocksList := []*Stocks{}
@@ -43,7 +43,7 @@ func Read(s string) ([]*Stocks, error){
   }
   return stocksList, nil
 }
-
+//抓取数据
 func getData(s string)(*Stocks, error){
   var stos *Stocks
   ch := make(chan *Stocks, 0)
@@ -58,17 +58,18 @@ func getData(s string)(*Stocks, error){
   if err != nil{
     return stos, err
   }
-  go dataProcessing(dst, ch)
+  go dataProcessing(dst, s, ch)
   stos = <-ch
   return stos, nil
 }
-
-func dataProcessing(s []byte, ch chan *Stocks){
+//数据处理
+func dataProcessing(s []byte, number string, ch chan *Stocks){
   udst := unicode(string(s))
   chars := splitString([]rune(udst))
   floats := stringListToFloatList(chars[:], 1, len(chars) - 3)
   chars = append(chars[:1], chars[30:]...)
   stocks := Stocks{
+      number,
       chars[0],
       floats[0],
       floats[1],
