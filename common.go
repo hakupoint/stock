@@ -9,6 +9,7 @@ import (
   "io"
 )
 
+
 func unicode(s string) string{
   enc := mahonia.NewDecoder("gbk")
   return enc.ConvertString(s)
@@ -49,5 +50,18 @@ func csvToString(s io.Reader) []string{
 }
 
 func parseCsv(s []string){
+  //var temlp = `
+  //
+  //`
+  //temp := template.New("CSV in cli")
+}
 
+func leftPad(s string, padStr string, pLen int) string{
+  length := len([]rune(s))
+  if(length > pLen){
+    return s
+  }else{
+    left := pLen - length
+    return strings.Repeat(padStr, left) + s
+  }
 }
