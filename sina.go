@@ -10,11 +10,7 @@ const (
   SINA_URL = "http://hq.sinajs.cn/list="
 )
 
-type ThighOrMoney struct{
-  thigh float64
-  money float64
-}
-
+//股票数据
 type Stocks struct {
   Number string
   Name string
@@ -33,6 +29,22 @@ type Stocks struct {
   Time string
 }
 
+//每手的数据
+type ThighOrMoney struct{
+  Thigh float64
+  Money float64
+}
+
+//历史数据
+type History struct {
+  Date string
+  open string
+  High string
+  Low string
+  Close string
+  Volume string
+  AdjClose string
+}
 
 //需要处理的数据
 func Read(s string) ([]*Stocks, error){
